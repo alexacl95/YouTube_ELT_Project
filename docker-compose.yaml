@@ -71,6 +71,8 @@ x-airflow-common:
     AIRFLOW__API_AUTH__JWT_ISSUER: ${AIRFLOW__API_AUTH__JWT_ISSUER:-airflow}
     # Enable health checks for the scheduler
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+    # Explicit dags folder path
+    AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
     # Setting Airflow Connections and Variables
     # NOTE 1: These will not show up on Airflow UI or using airflow connections/ variables list
     # However, functions such as Variable.get() will still work as per Airflow docs as long as
