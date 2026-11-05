@@ -1,5 +1,5 @@
 import json
-import datatime import date
+from datatime import date
 import logging
 
 logger = logging.getLogger(__name__)
