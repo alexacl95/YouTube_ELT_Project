@@ -20,6 +20,10 @@ def parse_duration(duration_str):
 def transform_data(row):
     duration_td = parse_duration(row["Duration"])
     row["Duration"] = (datetime.min + duration_td).time()
-    row["Video_Type"] = "Shorts" if duration_td.total_seconds() <= 60 else "Normal"
+    row["Video_type"] = "Shorts" if duration_td.total_seconds() <= 60 else "Normal"
+    
+    # Ensure Comments_Count exists for database insertion
+    if "Comments_Count" not in row:
+        row["Comments_Count"] = row.get("commentCount", None)
 
     return row

@@ -69,6 +69,7 @@ x-airflow-common:
     # [AIRFLOW 3] JWT settings shared by all components (api-server, scheduler, workers)
     AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW__API_AUTH__JWT_SECRET:-airflow_jwt_secret}
     AIRFLOW__API_AUTH__JWT_ISSUER: ${AIRFLOW__API_AUTH__JWT_ISSUER:-airflow}
+    AIRFLOW__API__SECRET_KEY: ${AIRFLOW__API__SECRET_KEY:-airflow_secret_key}
     # Enable health checks for the scheduler
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
     # Explicit dags folder path
