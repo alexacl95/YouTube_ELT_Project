@@ -1,0 +1,18 @@
+dataset: pg_datasource/elt_db/core/yt_api
+
+columns:
+  - name: Video_ID
+    checks:
+      - missing:
+      - duplicate:
+
+checks:
+  - failed_rows:
+      qualifier: likes_gt_views
+      name: Check for Likes_Count greater than Video_Views
+      expression: '"Likes_Count" > "Video_Views"'
+
+  - failed_rows:
+      qualifier: comments_gt_views
+      name: Check for Comments_Count greater than Video_Views
+      expression: '"Comments_count" > "Video_Views"'

@@ -1,0 +1,8 @@
+type: postgres
+name: pg_datasource
+connection:
+  host: ${env.POSTGRES_CONN_HOST}
+  port: ${env.POSTGRES_CONN_PORT}
+  database: ${env.ELT_DATABASE_NAME}
+  user: ${env.ELT_DATABASE_USERNAME}
+  password: ${env.ELT_DATABASE_PASSWORD}
