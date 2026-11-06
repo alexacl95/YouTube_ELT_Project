@@ -52,7 +52,7 @@ def update_rows(cur, conn, schema, row):
             video_title = "Video_Title"
             video_views = "Video_Views"
             likes_count = "Likes_Count"
-            comments_count = "Comments_Count"
+            comments_count = "Comments_count"
 
         cur.execute(
             f"""

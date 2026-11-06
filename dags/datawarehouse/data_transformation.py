@@ -23,7 +23,7 @@ def transform_data(row):
     row["Video_type"] = "Shorts" if duration_td.total_seconds() <= 60 else "Normal"
     
     # Ensure Comments_Count exists for database insertion
-    if "Comments_Count" not in row:
-        row["Comments_Count"] = row.get("commentCount", None)
+    if "Comments_count" not in row:
+        row["Comments_count"] = row.get("commentCount", None)
 
     return row
