@@ -1,4 +1,8 @@
-dataset: pg_datasource/elt_db/core/yt_api
+variables:
+  DATASET:
+    default: pg_datasource/elt_db/core/yt_api
+
+dataset: pg_datasource/elt_db/${var.DATASET}/yt_api
 
 columns:
   - name: Video_ID
