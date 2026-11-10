@@ -1,8 +1,13 @@
 import os
+import sys
 import pytest
 import psycopg2
 from unittest import mock
 from airflow.models import Variable, Connection, DagBag
+
+# Add dags folder to Python path so modules can be imported
+dags_folder = os.path.join(os.path.dirname(__file__), "..", "dags")
+sys.path.insert(0, dags_folder)
 
 
 @pytest.fixture
@@ -34,7 +39,8 @@ def mock_postgres_conn_vars():
 
 @pytest.fixture()
 def dagbag():
-    yield DagBag()
+    dag_folder = os.path.join(os.path.dirname(__file__), "..", "dags")
+    yield DagBag(dag_folder=dag_folder, safe_mode=True)
 
 
 @pytest.fixture()
@@ -44,6 +50,12 @@ def airflow_variable():
         return os.getenv(env_var)
 
     return get_airflow_variable
+
+
+# Ensure include folder is also in the path for Soda configurations
+include_folder = os.path.join(os.path.dirname(__file__), "..", "include")
+if include_folder not in sys.path:
+    sys.path.insert(0, include_folder)
 
 
 @pytest.fixture
@@ -69,3 +81,9 @@ def real_postgres_connection():
     finally:
         if conn:
             conn.close()
+
+
+# Ensure plugins folder is also in the path
+plugins_folder = os.path.join(os.path.dirname(__file__), "..", "plugins")
+if plugins_folder not in sys.path:
+    sys.path.insert(0, plugins_folder)
