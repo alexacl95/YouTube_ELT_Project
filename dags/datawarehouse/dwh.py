@@ -10,7 +10,7 @@ from datawarehouse.data_modification import insert_rows, update_rows, delete_row
 from datawarehouse.data_transformation import transform_data
 
 import logging
-from airflow.decorators import task
+from airflow.sdk import task
 
 logger = logging.getLogger(__name__)
 table = "yt_api"
