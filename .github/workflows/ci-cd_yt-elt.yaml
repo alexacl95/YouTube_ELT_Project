@@ -76,9 +76,9 @@ jobs:
           uses: tj-actions/changed-files@v45
           with:
             files: |
-        
-        - name: Set up Docker Buildx (for local build fallback)
-          if:
+                dags/**
+                include/**
+                docker-compose.yaml
         - name: Set up Docker Compose
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
           run: docker compose up -d
@@ -94,4 +94,4 @@ jobs:
             done
         - name: Tear down Docker Compose
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
-          run: docker compose downcker compose down
+          run: docker compose down
