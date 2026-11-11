@@ -91,7 +91,8 @@ jobs:
                 .
             fi
         - name: Set up Docker Compose
-          if: steps.changed-files-tests.        - name: Clean up volumes (if any)
+          if: steps.changed-files-tests.        
+        - name: Clean up volumes (if any)
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
           run: docker compose down -v 2>/dev/null || true
         - name: Create .env file for Docker Compose
