@@ -42,8 +42,8 @@ x-airflow-common:
   # Image stored on Dockerhub
   image: ${DOCKERHUB_NAMESPACE}/${DOCKERHUB_REPOSITORY}:lastest
   # Use the .env file to read the connection params and variables - SWITCH THIS OFF WHEN USING GITHUB ACTIONS
-  env_file:
-    - .env
+  # env_file:
+  #   - .env
   environment:
     &airflow-common-env
     # Set executor to CeleryExecutor
@@ -116,10 +116,6 @@ services:
     # NOTE: if you already have a postgres-db-volume created with Postgres 13,
     # you must recreate it (docker compose down -v) or migrate the data.
     image: postgres:16
-    # Use the .env file to read the connection params - SWITCH THIS OFF WHEN USING GITHUB ACTIONS
-    env_file:
-      - .env
-    # Env vars after POSTGRES_PASSWORD are needed for CI-CD workflow - SWITCH THIS ALL ON WHEN USING GITHUB ACTIONS
     environment:
       - POSTGRES_USER=${POSTGRES_CONN_USERNAME}
       - POSTGRES_PASSWORD=${POSTGRES_CONN_PASSWORD}
