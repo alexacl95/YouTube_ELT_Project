@@ -22,7 +22,7 @@ default_args = {
     "depends_on_past": False,
     "email_on_failure": False,
     "email_on_retry": False,
-    "eamil": "alexacl95@gmail.com",
+    "email": "alexacl95@gmail.com",
     # "retries": 1,
     # "retry_delay":timedelta(minutes=5),
     "max_active_runs": 1,
