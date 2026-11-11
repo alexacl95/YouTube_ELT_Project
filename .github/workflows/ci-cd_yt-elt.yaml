@@ -98,6 +98,17 @@ jobs:
         - name: Set up Docker Compose
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
           run: docker compose up --pull always -d
+        - name: Capture Postgres startup logs
+          if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
+          run: |
+            echo "=== Docker Compose Status ==="
+            docker compose ps
+            echo ""
+            echo "=== Postgres container status ==="
+            docker inspect postgres --format='{{json .State}}' | jq .
+            echo ""
+            echo "=== Full Postgres logs ==="
+            docker logs postgres 2>&1
         - name: Wait for Postgres initialization
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
           run: |
@@ -105,14 +116,17 @@ jobs:
             sleep 10
             for i in {1..30}; do
               echo "Checking Postgres health (attempt $i/30)..."
-              docker logs postgres 2>&1 | tail -20
+              docker inspect postgres --format='{{json .State}}' | jq .
               if docker exec postgres pg_isready -U postgres 2>/dev/null; then
                 echo "Postgres is ready"
                 break
               fi
               if [ $i -eq 30 ]; then
-                echo "ERROR: Postgres failed to initialize"
+                echo "ERROR: Postgres failed to initialize after 60 seconds"
+                echo "=== Final Postgres logs ==="
                 docker logs postgres
+                echo "=== Postgres container state ==="
+                docker inspect postgres | jq .
                 exit 1
               fi
               sleep 2
