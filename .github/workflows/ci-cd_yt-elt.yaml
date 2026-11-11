@@ -76,9 +76,7 @@ jobs:
           uses: tj-actions/changed-files@v45
           with:
             files: |
-                dags/**
-                include/**
-                docker-compose.yaml
+        
         - name: Set up Docker Buildx (for local build fallback)
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
           uses: docker/setup-buildx-action@v3
@@ -92,9 +90,38 @@ jobs:
                 --tag ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.DOCKERHUB_REPOSITORY }}:latest \
                 .
             fi
-        - name: Clean up volumes (if any)
+        - name: Set up Docker Compose
+          if: steps.changed-files-tests.        - name: Clean up volumes (if any)
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
           run: docker compose down -v 2>/dev/null || true
+        - name: Create .env file for Docker Compose
+          if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
+          run: |
+            cat > .env << EOF
+            AIRFLOW_UID=${AIRFLOW_UID}
+            AIRFLOW_WWW_USER_PASSWORD=${AIRFLOW_WWW_USER_PASSWORD}
+            AIRFLOW_WWW_USER_USERNAME=${AIRFLOW_WWW_USER_USERNAME}
+            API_KEY=${API_KEY}
+            CELERY_BACKEND_NAME=${CELERY_BACKEND_NAME}
+            CELERY_BACKEND_PASSWORD=${CELERY_BACKEND_PASSWORD}
+            CELERY_BACKEND_USERNAME=${CELERY_BACKEND_USERNAME}
+            CHANNEL_HANDLE=${CHANNEL_HANDLE}
+            DOCKERHUB_NAMESPACE=${DOCKERHUB_NAMESPACE}
+            DOCKERHUB_REPOSITORY=${DOCKERHUB_REPOSITORY}
+            ELT_DATABASE_NAME=${ELT_DATABASE_NAME}
+            ELT_DATABASE_PASSWORD=${ELT_DATABASE_PASSWORD}
+            ELT_DATABASE_USERNAME=${ELT_DATABASE_USERNAME}
+            FERNET_KEY=${FERNET_KEY}
+            METADATA_DATABASE_NAME=${METADATA_DATABASE_NAME}
+            METADATA_DATABASE_PASSWORD=${METADATA_DATABASE_PASSWORD}
+            METADATA_DATABASE_USERNAME=${METADATA_DATABASE_USERNAME}
+            POSTGRES_CONN_HOST=${POSTGRES_CONN_HOST}
+            POSTGRES_CONN_PASSWORD=${POSTGRES_CONN_PASSWORD}
+            POSTGRES_CONN_PORT=${POSTGRES_CONN_PORT}
+            POSTGRES_CONN_USERNAME=${POSTGRES_CONN_USERNAME}
+            EOF
+            echo "=== .env file created ==="
+            cat .env | sed 's/=.*/=***/' # Show structure without secrets
         - name: Set up Docker Compose
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
           run: docker compose up --pull always -d
@@ -140,8 +167,7 @@ jobs:
               docker logs postgres
               exit 1
             }
-        - name: Run Unit and Integration Tests
-          if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
+es-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
           run: docker exec -t airflow-worker sh -c "pytest tests/ -v"
         - name: Run End-to-End DAG Tests
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
@@ -152,4 +178,6 @@ jobs:
             done
         - name: Tear down Docker Compose
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
+          run: docker compose down
+hanged == 'true' || github.event_name == 'workflow_dispatch'
           run: docker compose down
