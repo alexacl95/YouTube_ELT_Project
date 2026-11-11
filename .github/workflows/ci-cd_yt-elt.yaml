@@ -78,97 +78,12 @@ jobs:
             files: |
         
         - name: Set up Docker Buildx (for local build fallback)
-          if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
-          uses: docker/setup-buildx-action@v3
-        - name: Build image locally if not found on registry
-          if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
-          run: |
-            # Try to pull the image; if it fails, build locally
-            if ! docker pull ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.DOCKERHUB_REPOSITORY }}:latest; then
-              echo "Image not found on registry, building locally..."
-              docker buildx build --load \
-                --tag ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.DOCKERHUB_REPOSITORY }}:latest \
-                .
-            fi
-        - name: Set up Docker Compose
-          if: steps.changed-files-tests.        
-        - name: Clean up volumes (if any)
-          if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
-          run: docker compose down -v 2>/dev/null || true
-        - name: Create .env file for Docker Compose
-          if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
-          run: |
-            cat > .env << EOF
-            AIRFLOW_UID=${AIRFLOW_UID}
-            AIRFLOW_WWW_USER_PASSWORD=${AIRFLOW_WWW_USER_PASSWORD}
-            AIRFLOW_WWW_USER_USERNAME=${AIRFLOW_WWW_USER_USERNAME}
-            API_KEY=${API_KEY}
-            CELERY_BACKEND_NAME=${CELERY_BACKEND_NAME}
-            CELERY_BACKEND_PASSWORD=${CELERY_BACKEND_PASSWORD}
-            CELERY_BACKEND_USERNAME=${CELERY_BACKEND_USERNAME}
-            CHANNEL_HANDLE=${CHANNEL_HANDLE}
-            DOCKERHUB_NAMESPACE=${DOCKERHUB_NAMESPACE}
-            DOCKERHUB_REPOSITORY=${DOCKERHUB_REPOSITORY}
-            ELT_DATABASE_NAME=${ELT_DATABASE_NAME}
-            ELT_DATABASE_PASSWORD=${ELT_DATABASE_PASSWORD}
-            ELT_DATABASE_USERNAME=${ELT_DATABASE_USERNAME}
-            FERNET_KEY=${FERNET_KEY}
-            METADATA_DATABASE_NAME=${METADATA_DATABASE_NAME}
-            METADATA_DATABASE_PASSWORD=${METADATA_DATABASE_PASSWORD}
-            METADATA_DATABASE_USERNAME=${METADATA_DATABASE_USERNAME}
-            POSTGRES_CONN_HOST=${POSTGRES_CONN_HOST}
-            POSTGRES_CONN_PASSWORD=${POSTGRES_CONN_PASSWORD}
-            POSTGRES_CONN_PORT=${POSTGRES_CONN_PORT}
-            POSTGRES_CONN_USERNAME=${POSTGRES_CONN_USERNAME}
-            EOF
-            echo "=== .env file created ==="
-            cat .env | sed 's/=.*/=***/' # Show structure without secrets
+          if:
         - name: Set up Docker Compose
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
-          run: docker compose up --pull always -d
-        - name: Capture Postgres startup logs
+          run: docker compose up -d
+        - name: Run Unit and Integration Tests
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
-          run: |
-            echo "=== Docker Compose Status ==="
-            docker compose ps
-            echo ""
-            echo "=== Postgres container status ==="
-            docker inspect postgres --format='{{json .State}}' | jq .
-            echo ""
-            echo "=== Full Postgres logs ==="
-            docker logs postgres 2>&1
-        - name: Wait for Postgres initialization
-          if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
-          run: |
-            echo "Waiting for Postgres to initialize..."
-            sleep 10
-            for i in {1..30}; do
-              echo "Checking Postgres health (attempt $i/30)..."
-              docker inspect postgres --format='{{json .State}}' | jq .
-              if docker exec postgres pg_isready -U postgres 2>/dev/null; then
-                echo "Postgres is ready"
-                break
-              fi
-              if [ $i -eq 30 ]; then
-                echo "ERROR: Postgres failed to initialize after 60 seconds"
-                echo "=== Final Postgres logs ==="
-                docker logs postgres
-                echo "=== Postgres container state ==="
-                docker inspect postgres | jq .
-                exit 1
-              fi
-              sleep 2
-            done
-        - name: Verify databases exist
-          if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
-          run: |
-            echo "Checking if required databases were created..."
-            docker exec postgres psql -U postgres -lqt | grep -E "$METADATA_DATABASE_NAME|$CELERY_BACKEND_NAME|$ELT_DATABASE_NAME" || {
-              echo "ERROR: Required databases not found"
-              docker logs postgres
-              exit 1
-            }
-es-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
           run: docker exec -t airflow-worker sh -c "pytest tests/ -v"
         - name: Run End-to-End DAG Tests
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
@@ -179,6 +94,4 @@ es-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatc
             done
         - name: Tear down Docker Compose
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
-          run: docker compose down
-hanged == 'true' || github.event_name == 'workflow_dispatch'
-          run: docker compose down
+          run: docker compose downcker compose down
