@@ -92,9 +92,27 @@ jobs:
                 --tag ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.DOCKERHUB_REPOSITORY }}:latest \
                 .
             fi
+        - name: Clean up volumes (if any)
+          if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
+          run: docker compose down -v 2>/dev/null || true
         - name: Set up Docker Compose
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
-          run: docker compose up -d
+          run: docker compose up --pull always -d
+        - name: Wait for Postgres to be healthy
+          if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
+          run: |
+            echo "Waiting for Postgres to be healthy..."
+            for i in {1..60}; do
+              if docker exec postgres pg_isready -U "$POSTGRES_USER" -d "$METADATA_DATABASE_NAME" 2>/dev/null; then
+                echo "Postgres is healthy"
+                exit 0
+              fi
+              echo "Attempt $i/60: Postgres not ready yet, retrying in 2s..."
+              sleep 2
+            done
+            echo "Postgres failed to become healthy"
+            docker logs postgres
+            exit 1
         - name: Run Unit and Integration Tests
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
           run: docker exec -t airflow-worker sh -c "pytest tests/ -v"
