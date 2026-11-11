@@ -79,6 +79,19 @@ jobs:
                 dags/**
                 include/**
                 docker-compose.yaml
+        - name: Set up Docker Buildx (for local build fallback)
+          if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
+          uses: docker/setup-buildx-action@v3
+        - name: Build image locally if not found on registry
+          if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
+          run: |
+            # Try to pull the image; if it fails, build locally
+            if ! docker pull ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.DOCKERHUB_REPOSITORY }}:latest; then
+              echo "Image not found on registry, building locally..."
+              docker buildx build --load \
+                --tag ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.DOCKERHUB_REPOSITORY }}:latest \
+                .
+            fi
         - name: Set up Docker Compose
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
           run: docker compose up -d
