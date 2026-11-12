@@ -1,6 +1,7 @@
 # YouTube ELT Project
 
-A complete Extract-Load-Transform (ELT) data pipeline that extracts YouTube video statistics using the YouTube API, loads the raw data into a staging layer, transforms it into a dimensional model in a core layer, and validates data quality. Built with Apache Airflow 3.3.2, PostgreSQL, Redis, and Soda for data quality checks.
+An Extract-Load-Transform (ELT) data pipeline that extracts YouTube video statistics using the YouTube API, loads the raw data into a staging layer, transforms it into a core layer, and validates data quality. Built with Apache Airflow 3.3.2, PostgreSQL, Redis, and Soda for data quality checks.
+Based on [MattTheDataEngineer](https://github.com/MattTheDataEngineer) course.
 
 ## Table of Contents
 
