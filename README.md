@@ -434,16 +434,6 @@ docker compose logs -f airflow-worker
 # Or via UI: Click on DAG run → task → Log
 ```
 
-### Query Results
-
-```bash
-docker compose exec postgres psql -U elt_user -d elt_db
-
-# In psql:
-SELECT * FROM staging.yt_api;
-SELECT * FROM core.yt_api;
-```
-
 ### Stop Services
 
 ```bash
