@@ -8,7 +8,7 @@ from api.video_stats import (
     save_to_json
 )
 
-from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator
 
 from datawarehouse.dwh import staging_table, core_table
 from dataquality.soda import yt_elt_data_quality
@@ -22,7 +22,6 @@ default_args = {
     "depends_on_past": False,
     "email_on_failure": False,
     "email_on_retry": False,
-    "email": "alexacl95@gmail.com",
     # "retries": 1,
     # "retry_delay":timedelta(minutes=5),
     "max_active_runs": 1,
