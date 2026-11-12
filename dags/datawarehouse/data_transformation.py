@@ -1,6 +1,12 @@
 from datetime import timedelta, datetime
 
 def parse_duration(duration_str):
+    """
+    Description: Parses an ISO 8601 duration string and returns a timedelta object
+    Input: str (ISO 8601 duration string, e.g., "PT1H30M45S")
+    Output: timedelta (duration represented as a timedelta object)
+    """
+
     duration_str = duration_str.replace("P", "").replace("T", "")
 
     components = ["D", "H", "M", "S"]
@@ -18,6 +24,12 @@ def parse_duration(duration_str):
 
 
 def transform_data(row):
+    """
+    Description: Transforms a row of video data for database insertion
+    Input: dict (row of video data)
+    Output: dict (transformed row of video data)
+    """
+
     duration_td = parse_duration(row["Duration"])
     row["Duration"] = (datetime.min + duration_td).time()
     row["Video_type"] = "Shorts" if duration_td.total_seconds() <= 60 else "Normal"

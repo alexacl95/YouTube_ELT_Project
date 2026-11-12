@@ -5,6 +5,11 @@ logger = logging.getLogger(__name__)
 SODA_PATH = "/opt/airflow/include/soda"
 
 def yt_elt_data_quality(schema):
+    """
+    Description: Runs data quality checks on the specified schema using Soda SQL.
+    Input: schema (string) - name of the schema to be checked
+    Output: executes a BashOperator task to run the checks
+    """
     try:
         task = BashOperator(
             task_id=f"soda_test_{schema}",

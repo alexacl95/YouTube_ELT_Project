@@ -15,7 +15,11 @@ maxResults = 50
 
 @task
 def get_playlist_id():
-    
+    """
+    Description: Calls YouTube API to get the channel's uploads playlist ID
+    Output: str (playlist ID)
+    """
+
     try:
         url = f'https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&forHandle={CHANNEL_HANDLE}&key={API_KEY}' 
 
@@ -33,6 +37,11 @@ def get_playlist_id():
 
 @task
 def get_video_ids(playlistId):
+    """
+    Description: Paginated retrieval of video IDs from a playlist (max 50 per request)
+    Input: str (playlist ID)
+    Output: list (video IDs)
+    """
 
     video_ids = []
     pageToken = None
@@ -66,6 +75,11 @@ def get_video_ids(playlistId):
 
 @task
 def extract_video_data(video_ids):
+    """
+    Description: Calls YouTube API to get video details for a list of video IDs
+    Input: list (video IDs)
+    Output: list (extracted video data: video_id, title, publishedAt, duration, viewCount, likeCount, commentCount)
+    """
     extracted_data = []
 
     def batch_list(video_id_list, batch_size):
@@ -105,6 +119,11 @@ def extract_video_data(video_ids):
         raise e
 @task
 def save_to_json(extracted_data):
+    """
+    Description: Saves extracted video data to a JSON file
+    Input: list (extracted video data from extract_video_data)
+    Output: None (saves data to a JSON file named YT_data_<current_date>.json)
+    """
     file_path = f"./data/YT_data_{date.today()}.json"
     
     with open(file_path, "w", encoding="utf-8") as json_outfile:

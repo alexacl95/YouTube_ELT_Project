@@ -5,6 +5,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 def load_data():
+    """
+    Description: Loads video data from a JSON file
+    Input: None (reads data from a JSON file named YT_data_<current_date>.json)
+    Output: list (video data loaded from the JSON file)
+    """
+
     file_path = f"./data/YT_data_{date.today()}.json"
 
     try:

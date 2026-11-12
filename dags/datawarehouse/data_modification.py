@@ -5,6 +5,16 @@ table = "yt_api"
 
 
 def insert_rows(cur, conn, schema, row):
+    """
+    Description: Inserts a new row into the specified schema and table in the database.
+    Input:
+        cur: Database cursor object
+        conn: Database connection object
+        schema: str (schema name)
+        row: dict (row data to be inserted)
+    Output: None (inserts a new row into the database)
+    """
+    
     try:
 
         if schema == "staging":
@@ -36,6 +46,16 @@ def insert_rows(cur, conn, schema, row):
 
 
 def update_rows(cur, conn, schema, row):
+    """
+        Description: Updates a row in {schema}.yt_api by Video_ID and Upload_Date
+        Input:
+            cur: Database cursor object
+            conn: Database connection object
+            schema: str (schema name)
+            row: dict (row data to be updated)
+        Output: None (updates a row in the database)
+        """
+    
     try:
         # staging
         if schema == "staging":
@@ -75,7 +95,15 @@ def update_rows(cur, conn, schema, row):
 
 
 def delete_rows(cur, conn, schema, ids_to_delete):
-
+    """
+    Description: Deletes rows by Video_ID set
+    Input:
+        cur: DB cursor
+        conn: DB connection
+        schema (str): "staging" or "core"
+        ids_to_delete (set): Video IDs to delete
+    Returns: None
+    """
     try:
         ids_to_delete = f"""({', '.join(f"'{id}'" for id in ids_to_delete)})"""
         cur.execute(

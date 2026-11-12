@@ -17,6 +17,19 @@ table = "yt_api"
 
 @task
 def staging_table():
+    """
+    Description: Updates the staging table with the latest video
+    data from the JSON file. Following this steps:
+      1. Connects to ELT DB
+      2. Loads JSON data
+      3. Creates schema & table
+      4. Fetches existing video IDs
+      5. Upsert: INSERT new, UPDATE existing
+      6. DELETE rows not in JSON
+    Input: None (reads data from the JSON file saved by save_to_json)
+    Output: None (updates the staging table in the database)
+    """
+
     schema = "staging"
     conn, cur = None, None
 
@@ -57,6 +70,20 @@ def staging_table():
 
 @task
 def core_table():
+    """ 
+    Description: Updates the core table with the latest video
+    data from the staging table. Following this steps:
+      1. Connects to ELT DB
+      2. Creates schema & table
+      3. Fetches existing video IDs
+      4. Reads all rows from staging.yt_api
+      5. Transforms each row via transform_data()
+      6. Upsert: INSERT new, UPDATE existing
+      7. DELETE rows not in staging
+    Input: None (reads data from the staging.yt_api table)
+    Output: None (updates the core.yt_api table in the database)
+    """
+
     schema = "core"
     conn, cur = None, None
 
